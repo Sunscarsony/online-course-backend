@@ -1,10 +1,10 @@
-require("dotenv").config();
+require('dotenv').config(); 
 
-const express = require("express");
-const cors = require("cors");
-const Razorpay = require("razorpay");
-const { createClient } = require("@supabase/supabase-js");
-const nodemailer = require("nodemailer");
+const express = require('express');
+const cors = require('cors');
+const Razorpay = require('razorpay');
+const { createClient } = require('@supabase/supabase-js');
+const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -22,7 +22,7 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
+  host: 'smtp.gmail.com',
   port: 587,
   secure: false,
   auth: {
@@ -31,82 +31,77 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-app.post("/create-order", async (req, res) => {
+
+app.post('/create-order', async (req, res) => {
   try {
     const { name, email, phone, user_type, amount } = req.body;
     if (!name || !email || !phone || !user_type || !amount) {
-      return res.status(400).json({ error: "Missing required fields" });
+      return res.status(400).json({ error: 'Missing required fields' });
     }
 
     const razorpayOrder = await razorpay.orders.create({
       amount: amount * 100,
-      currency: "INR",
-      receipt: "receipt#1",
+      currency: 'INR',
+      receipt: 'receipt#1',
     });
 
     if (!razorpayOrder || !razorpayOrder.id) {
-      return res.status(500).json({ error: "Error creating Razorpay order" });
+      return res.status(500).json({ error: 'Error creating Razorpay order' });
     }
 
     const order_id = razorpayOrder.id;
-    console.log("Received order id:", order_id);
+    console.log('Received order id:', order_id);
 
-    const payload = [
-      {
-        order_id,
-        name,
-        email,
-        phone,
-        user_type,
-        amount,
-        status: "Pending",
-      },
-    ];
-    console.log("Insert payload:", payload);
+    const payload = [{
+      order_id,
+      name,
+      email,
+      phone,
+      user_type,
+      amount,
+      status: 'Pending',
+    }];
+    console.log('Insert payload:', payload);
 
     const { data, error } = await supabase
-      .from("payment")
+      .from('payment')
       .insert(payload)
-      .select();
+      .select(); 
 
     if (error) {
-      console.error("Supabase insert error:", error);
-      return res
-        .status(500)
-        .json({ error: error.message || "Database insert error" });
+      console.error('Supabase insert error:', error);
+      return res.status(500).json({ error: error.message || 'Database insert error' });
     }
 
-    console.log("Supabase insert data:", data);
+    console.log('Supabase insert data:', data);
     return res.json({ order_id });
   } catch (err) {
-    console.error("Error in /create-order:", err);
-    return res.status(500).json({ error: "Internal server error" });
+    console.error('Error in /create-order:', err);
+    return res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-app.post("/verify-payment", async (req, res) => {
+app.post('/verify-payment', async (req, res) => {
   try {
     const { order_id, payment_id, name, email } = req.body;
     if (!order_id || !payment_id || !name || !email) {
-      return res.status(400).json({ error: "Missing required fields" });
+      return res.status(400).json({ error: 'Missing required fields' });
     }
 
     const { data, error } = await supabase
-      .from("payment")
-      .update({ payment_id, status: "Success" })
-      .eq("order_id", order_id);
+      .from('payment')
+      .update({ payment_id, status: 'Success' })
+      .eq('order_id', order_id);
 
     if (error) {
-      console.error("Supabase update error:", error);
-      return res
-        .status(500)
-        .json({ error: error.message || "Database update error" });
+      console.error('Supabase update error:', error);
+      return res.status(500).json({ error: error.message || 'Database update error' });
     }
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
-      subject: "Payment Successful!",
+      subject: 'Payment Successful!',
       html: `
         <h2>Payment Successful!</h2>
         <p>Hello <b>${name}</b>,</p>
@@ -114,25 +109,22 @@ app.post("/verify-payment", async (req, res) => {
         <p><b>Order ID:</b> ${order_id}</p>
         <p><b>Payment ID:</b> ${payment_id}</p>
         <p>Thank you for purchasing the course <b>Freelancing 101</b>!</p>
-        <p>This course is designed to help you build a strong personal brand as a freelancer and succeed in the gig economy. It provides practical strategies, tools, and exercises to help you discover your niche, craft a unique selling proposition, and create a powerful online presence that attracts clients.</p>
-        <p>You can access the course materials using the link below:</p>
-        <p><a href="https://drive.google.com/drive/folders/1clk5qVSybTUnN8mIyROIeqVkTt83PnTz?usp=sharing" target="_blank">Access Course Materials</a></p>
-        <p>Happy learning!</p>
+        <p>You can access the course materials <a href="https://drive.google.com/drive/folders/1clk5qVSybTUnN8mIyROIeqVkTt83PnTz?usp=sharing" target="_blank">here</a>.</p>
       `,
     };
 
     transporter.sendMail(mailOptions, (mailErr, info) => {
       if (mailErr) {
-        console.error("Error sending email:", mailErr);
+        console.error('Error sending email:', mailErr);
       } else {
-        console.log("Email sent:", info.response);
+        console.log('Email sent:', info.response);
       }
     });
 
     return res.sendStatus(200);
   } catch (err) {
-    console.error("Error in /verify-payment:", err);
-    return res.status(500).json({ error: "Internal server error" });
+    console.error('Error in /verify-payment:', err);
+    return res.status(500).json({ error: 'Internal server error' });
   }
 });
 
