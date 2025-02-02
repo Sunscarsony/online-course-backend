@@ -111,8 +111,8 @@ app.post("/verify-payment", async (req, res) => {
         <h2>Payment Successful!</h2>
         <p>Hello <b>${name}</b>,</p>
         <p>Your payment was successful.</p>
-        <p><b>Order ID:</b> ${orderId}</p>
-        <p><b>Payment ID:</b> ${paymentId}</p>
+        <p><b>Order ID:</b> ${order_id}</p>
+        <p><b>Payment ID:</b> ${payment_id}</p>
         <p>Thank you for purchasing the course <b>Freelancing 101</b>!</p>
         <p>This course is designed to help you build a strong personal brand as a freelancer and succeed in the gig economy. It provides practical strategies, tools, and exercises to help you discover your niche, craft a unique selling proposition, and create a powerful online presence that attracts clients.</p>
         <p>You can access the course materials using the link below:</p>
