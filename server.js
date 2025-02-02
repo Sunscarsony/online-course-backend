@@ -31,7 +31,6 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-
 app.post('/create-order', async (req, res) => {
   try {
     const { name, email, phone, user_type, amount } = req.body;
@@ -102,15 +101,55 @@ app.post('/verify-payment', async (req, res) => {
       from: process.env.EMAIL_USER,
       to: email,
       subject: 'Payment Successful!',
-      html: `
-        <h2>Payment Successful!</h2>
-        <p>Hello <b>${name}</b>,</p>
-        <p>Your payment was successful.</p>
-        <p><b>Order ID:</b> ${order_id}</p>
-        <p><b>Payment ID:</b> ${payment_id}</p>
-        <p>Thank you for purchasing the course <b>Freelancing 101</b>!</p>
-        <p>You can access the course materials <a href="https://drive.google.com/drive/folders/1clk5qVSybTUnN8mIyROIeqVkTt83PnTz?usp=sharing" target="_blank">here</a>.</p>
-      `,
+      html: `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Successful!</title>
+</head>
+<body>
+    <h2 style="color: green;">Payment Successful!</h2>
+    
+    <p>Hello <b>${name}</b>,</p>
+    
+    <p>Your payment was successful.</p>
+    
+    <p><b>Order ID:</b> ${order_id}</p>
+    <p><b>Payment ID:</b> ${payment_id}</p>
+    
+    <p>Thank you for purchasing the course <b>Freelancing 101</b>!</p>
+    
+    <p><i>This course is designed to help you build a strong personal brand as a freelancer and succeed in the gig economy.</i></p>
+    
+    <p>It provides <b>practical strategies, tools, and exercises</b> to help you:</p>
+    <ul>
+        <li>Discover your niche</li>
+        <li>Craft a unique selling proposition</li>
+        <li>Create a powerful online presence that attracts clients</li>
+    </ul>
+    
+    <p><b>You can access the course materials using the link below:</b></p>
+    <p><a href="https://drive.google.com/drive/folders/1clk5qVSybTUnN8mIyROIeqVkTt83PnTz?usp=sharing" target="_blank" style="color: blue; font-weight: bold;">Access Course Materials</a></p>
+    
+    <hr>
+    
+    <h3 style="color: #ff6600;">A Very Warm Welcome to Souvik D Fam by LearnInfini!</h3>
+    
+    <p>You have already taken the first step toward <b>making yourself skillful</b> and earning each month.</p>
+    
+    <p><b>Below is the link to your complimentary bundle</b> for learning all about <i>"Freelancing & Personal Branding."</i></p>
+    
+    <p>Begin your journey with the <b>right mentorship and guidance</b>. And also, don't forget to check out internship opportunities with an agency <b>'FrenchFryFeatures'</b> to increase your work experience and earnings.</p>
+    
+    <p style="font-style: italic; font-weight: bold; font-size: 18px; color: #ff0000;">" Just Do Itttt....."</p>
+    
+    <p><b>Link for Course:</b> <a href="https://drive.google.com/drive/folders/1clk5qVSybTUnN8mIyROIeqVkTt83PnTz?usp=sharing" style="color: blue;">https://drive.google.com/drive/folders/1clk5qVSybTUnN8mIyROIeqVkTt83PnTz?usp=sharing</a></p>
+    <p><b>Link for Internship:</b> <a href="https://docs.google.com/forms/d/e/1FAIpQLSd108UoLQmBtvHd3ScZesLdg7kDWY9WRRRWX_oCwOFIxydTuA/viewform" target="_blank" style="color: blue;">https://docs.google.com/forms/d/e/1FAIpQLSd108UoLQmBtvHd3ScZesLdg7kDWY9WRRRWX_oCwOFIxydTuA/viewform</a></p>
+    
+    <p>Happy Learning!</p>
+    <p>You can access the course materials <a href="https://drive.google.com/drive/folders/1clk5qVSybTUnN8mIyROIeqVkTt83PnTz?usp=sharing" target="_blank">here</a>.</p>
+</body>
+</html>`
     };
 
     transporter.sendMail(mailOptions, (mailErr, info) => {
